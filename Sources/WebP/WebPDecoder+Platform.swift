@@ -7,8 +7,8 @@ import CoreGraphics
 extension WebPDecoder {
 
     public func decode(_ webPData: Data, options: WebPDecoderOptions) throws -> CGImage {
-
-        let decodedData: Data = try decode(byrgbA: webPData, options: options)
+        var mutableOptions = options
+        let decodedData: Data = try decode(byrgbA: webPData, options: &mutableOptions)
         
         return decodedData.withUnsafeBytes { (ptr: UnsafePointer<UInt8>) -> CGImage in
             let provider = CGDataProvider(dataInfo: nil,
@@ -26,7 +26,7 @@ extension WebPDecoder {
                            height: options.scaledHeight,
                            bitsPerComponent: 8,
                            bitsPerPixel: 8 * bytesPerPixel,
-                           bytesPerRow: bytesPerPixel * options.scaledWidth,
+                           bytesPerRow: bytesPerPixel * mutableOptions.scaledWidth,
                            space: colorSpace,
                            bitmapInfo: bitmapInfo,
                            provider: provider,

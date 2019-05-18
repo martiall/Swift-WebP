@@ -89,10 +89,12 @@ public struct WebPDecoder {
                     deallocator: .free)
     }
 
-    public func decode(byrgbA webPData: Data, options: WebPDecoderOptions) throws -> Data {
+    public func decode(byrgbA webPData: Data, options: inout WebPDecoderOptions) throws -> Data {
 
         var config = makeConfig(options, .rgbA)
         try decode(webPData, config: &config)
+        options.scaledWidth = config.output.width
+        options.scaledHeight = config.output.height
 
         return Data(bytesNoCopy: config.output.u.RGBA.rgba,
                     count: config.output.u.RGBA.size,
@@ -157,6 +159,8 @@ public struct WebPDecoder {
         case .YUVA:
             config.output.u = WebPDecBuffer.Colorspace.YUVA(rawConfig.output.u.YUVA)
         }
+        config.output.width = Int(rawConfig.output.width)
+        config.output.height = Int(rawConfig.output.height)
     }
 
     private func makeConfig(_ options: WebPDecoderOptions,
